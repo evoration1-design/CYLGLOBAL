@@ -1,0 +1,137 @@
+# CYL AI Hub — 배포 가이드
+
+## 폴더 구조
+
+```
+cyl-ai-hub/
+├── api/
+│   └── chat.js          ← Vercel 서버리스 함수 (API 키 보관)
+├── public/
+│   └── index.html       ← 프론트엔드 앱
+├── vercel.json          ← Vercel 설정
+├── package.json
+└── .gitignore
+```
+
+---
+
+## 배포 순서 (10분 소요)
+
+### STEP 1 — GitHub 저장소 만들기
+
+1. https://github.com 접속 → 로그인
+2. 우측 상단 **+** → **New repository**
+3. Repository name: `cyl-ai-hub`
+4. **Private** 선택 (보안상 권장)
+5. **Create repository** 클릭
+
+---
+
+### STEP 2 — 파일 업로드
+
+GitHub 저장소 페이지에서:
+
+1. **uploading an existing file** 클릭
+2. 이 폴더(`cyl-ai-hub`) 전체를 드래그 앤 드롭
+   - `api/chat.js`
+   - `public/index.html`
+   - `vercel.json`
+   - `package.json`
+   - `.gitignore`
+3. **Commit changes** 클릭
+
+> ⚠️ `.env` 파일은 절대 업로드하지 마세요. API 키가 노출됩니다.
+
+---
+
+### STEP 3 — Vercel 배포
+
+1. https://vercel.com 접속 → **GitHub으로 로그인**
+2. **Add New Project** 클릭
+3. `cyl-ai-hub` 저장소 선택 → **Import**
+4. Framework Preset: **Other** 선택
+5. **Deploy** 클릭
+
+---
+
+### STEP 4 — API 키 환경변수 설정 ⭐ 핵심
+
+배포 완료 후:
+
+1. Vercel 대시보드 → 프로젝트 선택
+2. **Settings** → **Environment Variables**
+3. 아래 내용 입력:
+
+| Name | Value |
+|------|-------|
+| `ANTHROPIC_API_KEY` | `sk-ant-api03-...` (본인 키) |
+
+4. **Save** 클릭
+5. **Deployments** → 최신 배포 → **Redeploy** (환경변수 적용)
+
+---
+
+### STEP 5 — 도메인 확인
+
+배포 완료 후 Vercel이 자동으로 URL을 생성합니다:
+```
+https://cyl-ai-hub-xxxx.vercel.app
+```
+
+이 URL을 팀원들과 공유하면 됩니다.
+
+---
+
+## 커스텀 도메인 연결 (선택사항)
+
+`cyl-hub.com` 같은 도메인을 사용하려면:
+
+1. Vercel → Settings → **Domains**
+2. 도메인 입력 → **Add**
+3. DNS 설정에서 CNAME 레코드 추가
+
+---
+
+## Anthropic API 키 발급 방법
+
+1. https://console.anthropic.com 접속
+2. **API Keys** → **Create Key**
+3. 키 이름: `CYL-Hub-Production`
+4. 생성된 키 복사 (`sk-ant-api03-...`)
+
+> 💡 API 사용 요금: 대화 1회당 약 $0.003~0.015 수준 (Claude Sonnet 기준)
+
+---
+
+## 보안 체크리스트
+
+- [x] API 키가 `public/index.html`에 없고 서버(api/chat.js)에만 있음
+- [x] GitHub 저장소가 Private으로 설정됨
+- [x] `.env` 파일이 `.gitignore`에 포함됨
+- [ ] (권장) Vercel에서 특정 도메인만 허용하도록 CORS 제한
+
+---
+
+## 팀원 접속 방법
+
+URL만 공유하면 됩니다. 별도 설치나 계정 불필요.
+
+```
+https://cyl-ai-hub-xxxx.vercel.app
+```
+
+모바일에서도 접속 가능합니다.
+
+---
+
+## 문제 해결
+
+**"API 키가 설정되지 않았습니다" 오류**
+→ Vercel 환경변수에 `ANTHROPIC_API_KEY`가 설정되었는지 확인
+→ 설정 후 Redeploy 필요
+
+**응답이 없거나 느림**
+→ Anthropic API 크레딧 잔액 확인: https://console.anthropic.com
+
+**페이지가 안 열림**
+→ Vercel 대시보드에서 배포 로그 확인
